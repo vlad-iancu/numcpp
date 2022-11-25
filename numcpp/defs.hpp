@@ -16,6 +16,12 @@ namespace npp
 
 	typedef float         f4;
 	typedef double        f8;
+
+	enum array_order
+	{
+		C_CONTIGUOUS = 1,
+		F_CONTIGUOUS = 2
+	};
 }
 
 #endif

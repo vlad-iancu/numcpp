@@ -1,51 +1,45 @@
 #include <iostream>
 
 #include <numcpp/matrix.hpp>
+#include <numcpp/ndarray.hpp>
 
 using namespace npp;
 
-void fun(matrix<i32> mat)
-{
-	for(u64 j = 0; j < mat.columns(); j++)
-	{
-		for(u64 i = 0; i < mat.lines(); i++)
-		{
-			mat.set(i, j, mat.columns() * j + i);
-		}
-	}
-}
-
 int main()
 {
-	matrix<i32> mat(4, 4);
-
+	ndarray cube({4, 4, 4}, 8, array_order::C_CONTIGUOUS);
+	std::cout << "Array strides (main): (";
+	for(u64 i = 0;i < cube.stride.n; i++)
+	{
+		std::cout << " " << cube.stride[i];
+	}
+	std::cout << " )" << std::endl;
+	i64 index = 0;
 	for(u64 j = 0; j < 4; j++)
-	{
 		for(u64 i = 0; i < 4; i++)
-		{
-			mat.set(i, j, mat.columns() * j + i);
-		}
-	}
+			for(u64 k = 0; k < 4; k++)
+			{
+				cube.set<i64>({k, i, j}, index);
+				index++;
+			}
 
-	matrix<i32> top_right(mat.slice(0, 1, 2, 3));
-	fun(top_right);
-	for(u64 i = 0;i < 4; i++)
+	
+	for(u64 i = 0;i < 64 * cube.dtype; i += cube.dtype)
 	{
-		for(u64 j = 0;j < 4; j++)
-		{
-			std::cout << mat.get(i, j) << " ";
-		}
-		std::cout << std::endl;
+		std::cout << *((i64*)(cube.a + i)) << " ";
 	}
-
-	std::cout << std::endl;
-
-	for(u64 i = 0; i < 2; i++)
+	ndarray cube_slice = cube.slice({0, 1, 0}, {0, 1, 4});
+	std::cout << "Slice strides (main): (";
+	for(u64 i = 0;i < cube_slice.stride.n; i++)
 	{
-		for(u64 j = 0; j < 2; j++)
-		{
-			std::cout << top_right.get(i, j) << " ";
-		}
-		std::cout << std::endl;
+		std::cout << " " << cube_slice.stride[i];
 	}
+	std::cout << " )" << std::endl;
+	std::cout << "Slice shape (main): (";
+	for(u64 i = 0;i < cube_slice.s.n; i++)
+	{
+		std::cout << " " << cube_slice.s[i];
+	}
+	std::cout << " )" << std::endl;
+	std::cout << "Finished program" << std::endl;
 }

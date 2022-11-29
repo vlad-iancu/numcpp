@@ -7,7 +7,7 @@ using namespace npp;
 
 int main()
 {
-	ndarray cube({4, 4, 4}, 8, array_order::C_CONTIGUOUS);
+	ndarray cube({4, 4, 4}, 8, array_order::F_CONTIGUOUS);
 	std::cout << "Array strides (main): (";
 	for(u64 i = 0;i < cube.stride.n; i++)
 	{

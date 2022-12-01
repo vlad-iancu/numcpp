@@ -3,6 +3,7 @@
 
 #include <numcpp/defs.hpp>
 #include <numcpp/narray.hpp>
+#include <numcpp/refcount.hpp>
 
 #include <initializer_list>
 
@@ -21,7 +22,7 @@ namespace npp
 		~ndarray();
 
 	protected:
-		ndarray(shape s, index_bound upper, index_bound lower, u8 dtype, array_order order, strides stride, u64 offset, u64 *ref_count);
+		ndarray(shape s, shape view_shape, index_bound upper, index_bound lower, u8 dtype, array_order order, strides stride, u64 offset, refcount ref_count);
 
 	public:
 		template<typename T>
@@ -29,7 +30,7 @@ namespace npp
 		{
 			u8* result_index = a;
 			result_index += offset;
-			for(u64 i = 0;i < index.n; i++)
+			for(u64 i = 0; i < index.n; i++)
 			{
 				result_index += stride[i] * index[i];
 			}
@@ -61,7 +62,7 @@ namespace npp
 		array_order order;
 
 	 protected:
-		u64 *ref_count;
+		refcount ref;
 	};
 }
 

@@ -7,9 +7,11 @@ narray::narray(): narray(0)
 {}
 
 narray::narray(std::initializer_list<u64> dims)
+	: val(new u64[dims.size()]),
+	  n(dims.size()),
+	  ref((u8*)val)
 {
 	n = dims.size();
-	val = new u64[n];
 	u64 i = 0;
 	for(auto n : dims)
 	{
@@ -19,23 +21,24 @@ narray::narray(std::initializer_list<u64> dims)
 }
 
 narray::narray(u64 n)
+	: val(new u64[n]),
+	  ref((u8*)val)
 {
-	val = new u64[n];
 	this->n = n;
-	for(u64 i = 0;i < n; i++)
+	for(u64 i = 0; i < n; i++)
 	{
-	 val[i] = 0;
+		val[i] = 0;
 	}
 }
 
 narray::narray(const narray &other)
+	: val(new u64[other.n]),
+	  ref((u8*)val),
+	  n(other.n)
 {
 	n = other.n;
-	val = new u64[n];
-	for(u64 i = 0; i < n; i++)
-	{
-	val[i] = other.val[i];
-	}
+	ref = other.ref;
+	val = other.val;
 }
 
 void narray::resize(u64 n, u64 value)
@@ -51,7 +54,8 @@ void narray::resize(u64 n, u64 value)
 	{
 		continuation[i] = value;
 	}
-	delete[] val;
+	refcount new_ref((u8*)new_arr);
+	ref = new_ref;
 	val = new_arr;
 	this->n = n;
 }
@@ -61,13 +65,9 @@ narray& narray::operator=(const narray &other)
 {
 	if(&other != this)
 	{
-		delete[] val;
+		this->ref = other.ref;
+		this->val = other.val;
 		this->n = other.n;
-		this->val = new u64[n];
-		for(u64 i = 0;i < n; i++)
-		{
-			val[i] = other.val[i];
-		}
 	}
 	return *this;
 }
@@ -79,5 +79,4 @@ u64& narray::operator[](u64 i)
 
 narray::~narray()
 {
-	delete[] val;
 }

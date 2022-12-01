@@ -2,13 +2,18 @@
 #define NUMCPP_NARRAY_H
 
 #include <numcpp/defs.hpp>
+#include <numcpp/refcount.hpp>
+
 #include <initializer_list>
+
 namespace npp
 {
+	//defines a positive n-sized array, mainly used for indices and shapes of ndarrays
 	struct narray
 	{
 		u64 n;
 		u64 *val;
+
 		explicit narray();
 		narray(std::initializer_list<u64> dims);
 
@@ -23,7 +28,8 @@ namespace npp
 		u64& operator[](u64 i);
 
 		~narray();
-
+		
+		refcount ref;
 	};
 }
 

@@ -42,7 +42,7 @@ ndarray::ndarray(shape array_shape, u8 dtype, array_order order)
 	ref = refcount(a);
 	this->dtype = dtype;
 	this->order = order;
-	this->offset = 0;
+	this->offset = a;
 	this->stride = stride;
 }
 
@@ -50,7 +50,7 @@ ndarray::~ndarray()
 {
 }
 
- ndarray::ndarray(shape s, shape view_shape, index_bound upper, index_bound lower, u8 dtype, array_order order, strides stride, u64 offset, refcount ref_count):
+ ndarray::ndarray(shape s, shape view_shape, index_bound upper, index_bound lower, u8 dtype, array_order order, strides stride, u8 *offset, refcount ref_count):
 	 ref(ref_count)
 {
 	this->s = s;
@@ -67,7 +67,7 @@ ndarray::~ndarray()
 ndarray ndarray::slice(index_bound lower, index_bound upper)
 {
 	u64 ndims = 0;
-	u64 offset = 0;
+	u8 *offset = a;
 	strides slice_strides(lower.n);
 	shape slice_shape(lower.n);
 	for(u64 i = 0;i < lower.n; i++)

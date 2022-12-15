@@ -22,14 +22,13 @@ namespace npp
 		~ndarray();
 
 	protected:
-		ndarray(shape s, shape view_shape, index_bound upper, index_bound lower, u8 dtype, array_order order, strides stride, u64 offset, refcount ref_count);
+		ndarray(shape s, shape view_shape, index_bound upper, index_bound lower, u8 dtype, array_order order, strides stride, u8 *offset, refcount ref_count);
 
 	public:
 		template<typename T>
 		T get(ndarray_index index)
 		{
-			u8* result_index = a;
-			result_index += offset;
+			u8* result_index = offset;
 			for(u64 i = 0; i < index.n; i++)
 			{
 				result_index += stride[i] * index[i];
@@ -40,8 +39,7 @@ namespace npp
 		template<typename T>
 		void set(ndarray_index index, T value)
 		{
-			u8* result_index = a;
-			result_index += offset;
+			u8* result_index = offset;
 			for(u64 i = 0;i < index.n; i++)
 			{
 				result_index += stride[i] * index[i];
@@ -56,7 +54,7 @@ namespace npp
 		index_bound lower;
 		index_bound upper;
 		strides stride;
-		u64 offset;
+		u8 *offset;
 		u8 *a;
 		u8 dtype;
 		array_order order;

@@ -2,16 +2,17 @@
 #define NUMCPP_MATRIX_H
 
 #include <numcpp/defs.hpp>
+#include <numcpp/refcount.hpp>
 
 namespace npp
 {
 
-	template<typename T>
 	class matrix
 	{
 	public:
 		
-		explicit matrix(u64 n, u64 m)
+		explicit matrix(u64 n, u64 m, u8 dtype)
+			: ref(nullptr)
 		{
 			this->n = n;
 			this->m = m;
@@ -19,15 +20,17 @@ namespace npp
 			this->m_view = m;
 			this->i_view = 0;
 			this->j_view = 0;
-			a = new T[n * m];
-			ref_count = new u64(1);
+			this->dtype = dtype;
+			a = new u8[n * m * dtype];
+			ref = refcount(a);
 		}
 
 		explicit matrix(u64 n)
-			: matrix(n, n)
+			: matrix(n, n, 4)
 		{}
 
-		matrix(const matrix<T> &other)
+		matrix(const matrix &other)
+			: ref(nullptr)
 		{
 			this->n = other.n;
 			this->m = other.m;
@@ -35,18 +38,9 @@ namespace npp
 			this->m_view = other.m_view;
 			this->i_view = other.i_view;
 			this->j_view = other.j_view;
-			this->ref_count = other.ref_count;
+			this->ref= other.ref;
+			this->dtype = other.dtype;
 			a = other.a;
-			*ref_count++;
-		}
-
-		~matrix()
-		{
-			(*ref_count)--;
-			if(*ref_count <= 0)
-			{
-				delete[] a;
-			}
 		}
 
 	protected:
@@ -58,9 +52,10 @@ namespace npp
 			u64 j_view, 
 			u64 n_view, 
 			u64 m_view,
-			T *a,
-			u64 *ref_count
+			u8 *a,
+			refcount ref
 		)
+			: ref(nullptr)
 		{
 			this->a = a;
 			this->n = n;
@@ -70,8 +65,7 @@ namespace npp
 			this->n_view = n_view;
 			this->m_view = m_view;
 			this->a = a;
-			this->ref_count = ref_count;
-			*ref_count++;
+			this->ref = ref;
 		}
 
 	protected:
@@ -81,8 +75,11 @@ namespace npp
 		u64 j_view;
 		u64 n_view;
 		u64 m_view;
-		u64 *ref_count;
-		T *a;
+		refcount ref;
+
+	public:
+		u8 *a;
+		u8 dtype;
 
 	public:
 		u64 lines() const
@@ -95,19 +92,21 @@ namespace npp
 			return m_view;
 		}
 
-		T get(u64 i, u64 j) const
+		template <typename T>
+		inline T get(u64 i, u64 j) const
 		{
-			return a[n * (j_view + j) + (i_view + i)];
+			return ((T*)a)[n * (j_view + j) + (i_view + i)];
 		}
 
-		void set(u64 i, u64 j, T value)
+		template <typename T>
+		inline void set(u64 i, u64 j, T value)
 		{
-			a[n * (j_view + j) + (i_view + i)] = value;
+			((T*)a)[n * (j_view + j) + (i_view + i)] = value;
 		}
 
-		matrix<T> slice(u64 start_line, u64 end_line, u64 start_column, u64 end_column) const
+		matrix slice(u64 start_line, u64 end_line, u64 start_column, u64 end_column) const
 		{
-			return matrix<T>(
+			return matrix(
 					n,
 					m,
 					i_view + start_line,
@@ -115,7 +114,7 @@ namespace npp
 					end_line - start_line + 1,
 					end_column - start_column + 1,
 					a,
-					ref_count
+					ref
 					);
 		}
 

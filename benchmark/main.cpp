@@ -5,14 +5,12 @@
 
 using namespace npp;
 
-void changeFirstElementTo1(narray arr)
-{
-	arr[0] = 1;
-}
+#define N 1000
+#define M 1200
 
 int main()
 {
-	std::cout << "Entered main" << std::endl;
+
 	ndarray cube({4, 4, 4}, 8, array_order::F_CONTIGUOUS);
 	std::cout << "Allocated cube" << std::endl;
 	std::cout << "Array strides (main): (";
@@ -44,14 +42,14 @@ int main()
 	}
 	std::cout << " )" << std::endl;
 	std::cout << "Slice shape (main): (";
-	for(u64 i = 0;i < cube_slice.view_shape.n; i++)
+	for(u64 i = 0;i < cube_slice.s.n; i++)
 	{
-		std::cout << " " << cube_slice.view_shape[i];
+		std::cout << " " << cube_slice.s[i];
 	}
 	std::cout << " )" << std::endl;
-	std::cout << "Slice shape = " << cube_slice.view_shape[0] << std::endl;
+	std::cout << "Slice shape = " << cube_slice.s[0] << std::endl;
 	std::cout << "Slice = ["; 
-	for(u64 i = 0;i < cube_slice.view_shape[0]; i++)
+	for(u64 i = 0;i < cube_slice.s[0]; i++)
 	{
 		std::cout << " " << cube_slice.get<i64>({i});
 	}

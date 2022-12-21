@@ -8,8 +8,6 @@
 #include <iomanip>
 #include <functional>
 
-#include <numcpp/array.hpp>
-
 #define ITER 500
 #define N 1000
 #define M 1200
@@ -134,21 +132,10 @@ void small_for(u8 *a, u64 iter)
 	}
 }
 
-void static_array_loop(array<i32, array_order::F_CONTIGUOUS, N, M> arr, u64 iter)
-{
-	volatile i32 x;
-	for(u64 i = 0; i < N; ++i)
-		for(u64 j = 0; j < M; ++j)
-		{
-			x = arr.get(i, j);
-		}
-}
-
 int main()
 {
 	ndarray arr({N, M}, 4, array_order::F_CONTIGUOUS);
 	ndarray cube({K1, K2, K3}, 4, array_order::F_CONTIGUOUS); 
-	npp::array<i32, array_order::F_CONTIGUOUS, N, M> static_array;
 	for(u8 *i = cube.a; i < cube.a + K1 * K2 * K3; i += cube.dtype)
 	{
 		*((i32*)i) = (i - cube.a) / cube.dtype;
@@ -175,7 +162,6 @@ int main()
 	double cubefor = run("classic for (cube)", ITER, std::bind(&cube_for, cube.a, std::placeholders::_1));
 	double big_for_avg = run("big for (cube)", ITER * 5, std::bind(&big_for, cube.a, std::placeholders::_1));
 	double small_for_avg = run("small for (cube)", ITER * 5, std::bind(&small_for, cube.a, std::placeholders::_1));
-	double static_array_avg = run("static array", ITER, std::bind(&static_array_loop, static_array, std::placeholders::_1));
 	
 
 	std::cout << "ndarrayread (avg): " << std::fixed << ndarrayread << std::setprecision(9) << std::endl;
@@ -187,6 +173,5 @@ int main()
 	std::cout << "classic_for cube (avg): " << std::fixed << cubefor << std::setprecision(9) << std::endl;
 	std::cout << "big for (avg): " << std::fixed << big_for_avg << std::setprecision(9) << std::endl;
 	std::cout << "small for (avg): " << std::fixed << small_for_avg << std::setprecision(9) << std::endl;
-	std::cout << "static array (avg): " << std::fixed << static_array_avg << std::setprecision(9) << std::endl;
 	return 0;	
 }

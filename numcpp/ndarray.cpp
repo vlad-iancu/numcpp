@@ -1,13 +1,12 @@
 #include <numcpp/ndarray.hpp>
 
+#include <iostream>
+
 using namespace npp;
 
 ndarray::ndarray(shape array_shape, u8 dtype, array_order order)
 	: 
 		s(array_shape),
-		lower(array_shape.n),
-		upper(array_shape),
-		view_shape(array_shape),
 		ref(nullptr)
 {
 	s.n = array_shape.n;
@@ -42,7 +41,6 @@ ndarray::ndarray(shape array_shape, u8 dtype, array_order order)
 	ref = refcount(a);
 	this->dtype = dtype;
 	this->order = order;
-	this->offset = a;
 	this->stride = stride;
 }
 
@@ -50,19 +48,15 @@ ndarray::~ndarray()
 {
 }
 
- ndarray::ndarray(shape s, shape view_shape, index_bound upper, index_bound lower, u8 dtype, array_order order, strides stride, u8 *offset, refcount ref_count):
+ ndarray::ndarray(u8 *data, shape s, u8 dtype, array_order order, strides stride, refcount ref_count):
 	 ref(ref_count)
 {
 	this->s = s;
-	this->upper = upper;
-	this->lower = lower;
 	this->dtype = dtype;
 	this->order = order;
 	this->stride = stride;
-	this->offset = offset;
 	this->ref = ref_count;
-	this->view_shape = view_shape;
-	this->a = ref_count.data;
+	this->a = data;
 }
 ndarray ndarray::slice(index_bound lower, index_bound upper)
 {
@@ -70,10 +64,10 @@ ndarray ndarray::slice(index_bound lower, index_bound upper)
 	u8 *offset = a;
 	strides slice_strides(lower.n);
 	shape slice_shape(lower.n);
-	for(u64 i = 0;i < lower.n; i++)
+	for(u64 i = 0; i < lower.n; ++i)
 	{
-		offset += stride[i] * (lower[i] - this->lower[i]);
-		if(upper[i] - lower[i] > 0)
+		offset += stride[i] * lower[i]; 
+		if(upper.val[i] > lower.val[i])
 		{
 			slice_strides[ndims] = stride[i];
 			slice_shape[ndims] = upper[i] - lower[i];
@@ -83,5 +77,5 @@ ndarray ndarray::slice(index_bound lower, index_bound upper)
 
 	slice_strides.resize(ndims);
 	slice_shape.resize(ndims);
-	return ndarray(s, slice_shape, upper, lower, dtype, order, slice_strides, offset, ref);
+	return ndarray(offset, slice_shape, dtype, order, slice_strides, ref);
 }

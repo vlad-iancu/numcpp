@@ -1,4 +1,5 @@
 #include <numcpp/narray.hpp>
+
 #include <algorithm>
 
 using namespace npp;
@@ -73,6 +74,11 @@ narray& narray::operator=(const narray &other)
 }
 
 u64& narray::operator[](u64 i)
+{
+	return val[i];
+}
+
+u64& narray::operator[](u64 i) const
 {
 	return val[i];
 }

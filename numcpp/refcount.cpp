@@ -1,20 +1,21 @@
-#include <iostream>
 #include <numcpp/refcount.hpp>
 
 using namespace npp;
 
-refcount::refcount(u8 *data)
+refcount::refcount(void *data)
 {
 	ref_count = new u64(1);
 	this->data = data;
 }
 
 refcount::refcount(const refcount &other)
+	: data(other.data)
 {
 	ref_count = other.ref_count;
 	data = other.data;
 	increment();
 }
+
  refcount::~refcount()
 {
 	decrement();
@@ -44,12 +45,6 @@ refcount& refcount::operator=(const refcount &other)
 {
 	if(&other != this)
 	{
-		decrement();
-		if(*ref_count <= 0)
-		{
-			delete[] data;
-			delete ref_count;
-		}
 		data = other.data;
 		ref_count = other.ref_count;
 		increment();

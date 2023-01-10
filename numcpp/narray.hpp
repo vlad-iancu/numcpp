@@ -26,11 +26,16 @@ namespace npp
 		narray& operator=(const narray &other);
 
 		u64& operator[](u64 i);
+		u64& operator[](u64 i) const;
 
 		~narray();
 		
 		refcount ref;
 	};
+
+	typedef narray shape;
+	typedef narray index_bound;
+	typedef narray strides;
 }
 
 #endif

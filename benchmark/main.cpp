@@ -1,58 +1,31 @@
 #include <iostream>
 
 #include <numcpp/matrix.hpp>
-#include <numcpp/ndarray.hpp>
+#include <numcpp/ndarray_meat.hpp>
 
 using namespace npp;
 
-#define N 1000
-#define M 1200
 
 int main()
 {
-
-	ndarray cube({4, 4, 4}, 8, array_order::F_CONTIGUOUS);
-	std::cout << "Allocated cube" << std::endl;
-	std::cout << "Array strides (main): (";
-	for(u64 i = 0;i < cube.stride.n; i++)
-	{
-		std::cout << " " << cube.stride[i];
-	}
-	std::cout << " )" << std::endl;
-	i64 index = 0;
-	for(u64 j = 0; j < 4; j++)
-		for(u64 i = 0; i < 4; i++)
-			for(u64 k = 0; k < 4; k++)
-			{
-				cube.set<i64>({k, i, j}, index);
-				index++;
-			}
-
+	constexpr u64 N = 8;
+	constexpr u64 M = 5;
 	
-	for(u64 i = 0;i < 64 * cube.dtype; i += cube.dtype)
+	matrix<i32> mat(N, M);
+	
+	for(u64 i = 0; i < N * M; ++i)
 	{
-		std::cout << *((i64*)(cube.a + i)) << " ";
+		mat.a[i] = i;
 	}
-	std::cout << std::endl;
-	ndarray cube_slice = cube.slice({0, 1, 0}, {0, 1, 4});
-	std::cout << "Slice strides (main): (";
-	for(u64 i = 0;i < cube_slice.stride.n; i++)
+
+	for(u64 i = 0; i < N; ++i)
 	{
-		std::cout << " " << cube_slice.stride[i];
+		for(u64 j = 0; j < M; ++j)
+		{
+			std::cout << mat.get(i, j) << " ";
+		}
+		std::cout << std::endl;
 	}
-	std::cout << " )" << std::endl;
-	std::cout << "Slice shape (main): (";
-	for(u64 i = 0;i < cube_slice.s.n; i++)
-	{
-		std::cout << " " << cube_slice.s[i];
-	}
-	std::cout << " )" << std::endl;
-	std::cout << "Slice shape = " << cube_slice.s[0] << std::endl;
-	std::cout << "Slice = ["; 
-	for(u64 i = 0;i < cube_slice.s[0]; i++)
-	{
-		std::cout << " " << cube_slice.get<i64>({i});
-	}
-	std::cout << " ]" << std::endl;
-	std::cout << "Finished program" << std::endl;
+	
+	
 }

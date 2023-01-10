@@ -9,10 +9,11 @@ namespace npp
 	// ndarray class
 	struct refcount
 	{
-		u8 *data;
+		void *data;
 		u64 *ref_count;
 		
-		refcount(u8 *data);
+		refcount() = default;
+		refcount(void *data);
 		refcount(const refcount &other);
 		~refcount();
 
